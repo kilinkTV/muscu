@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Upper / Lower</title>
+<meta name="theme-color" content="#D7263D">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{
+  --bg:#F2F4F7; --surface:#FFFFFF; --text:#15202B; --muted:#5B6672; --line:#DCE1E7; --field:#F6F8FA;
+  --red:#D7263D; --blue:#1F5FD6; --yellow:#C99A00; --green:#2E9E5B; --on-accent:#FFFFFF;
+  --accent:var(--red);
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F1720; --surface:#18222D; --text:#E8EDF2; --muted:#9AA6B2; --line:#2A3642; --field:#121B25;
+    --red:#E8455A; --blue:#4C86F0; --yellow:#E8B400; --green:#3DB46E;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F1720; --surface:#18222D; --text:#E8EDF2; --muted:#9AA6B2; --line:#2A3642; --field:#121B25;
+  --red:#E8455A; --blue:#4C86F0; --yellow:#E8B400; --green:#3DB46E;
+  color-scheme:dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Barlow,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:16px;line-height:1.4;-webkit-text-size-adjust:100%}
+body[data-day="lun"]{--accent:var(--red)}
+body[data-day="mar"]{--accent:var(--blue)}
+body[data-day="jeu"]{--accent:var(--yellow)}
+body[data-day="ven"]{--accent:var(--green)}
+body[data-day="hist"]{--accent:var(--text)}
+.wrap{max-width:560px;margin:0 auto;padding:16px 16px 48px}
+header{display:flex;flex-direction:column;gap:2px}
+h1{font-family:"Barlow Condensed","Roboto Condensed","sans-serif-condensed","Arial Narrow",sans-serif;font-weight:700;font-size:30px;margin:0;letter-spacing:.2px;line-height:1.1}
+.date{color:var(--muted);font-size:15px}
+nav{display:flex;gap:8px;margin:16px 0 20px;overflow-x:auto;padding-bottom:4px}
+.plate{flex:0 0 auto;width:54px;height:54px;border-radius:50%;border:5px solid var(--c);background:var(--surface);color:var(--text);font-family:"Barlow Condensed","Roboto Condensed","sans-serif-condensed","Arial Narrow",sans-serif;font-weight:700;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;position:relative}
+.plate[aria-pressed="true"]{background:var(--c);color:var(--on-accent)}
+.plate.jeu[aria-pressed="true"]{color:#15202B}
+.plate.hist{--c:var(--muted);border-radius:14px;width:auto;padding:0 12px;font-size:16px}
+.plate.hist[aria-pressed="true"]{background:var(--text);border-color:var(--text);color:var(--bg)}
+.plate:focus-visible,button:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.dayhead{border-left:6px solid var(--accent);padding-left:12px;margin-bottom:16px}
+.dayhead h2{font-family:"Barlow Condensed","Roboto Condensed","sans-serif-condensed","Arial Narrow",sans-serif;font-size:28px;margin:0;line-height:1.1}
+.dayhead p{margin:2px 0 0;color:var(--muted)}
+.status{font-size:13px;color:var(--muted);min-height:18px;margin:-6px 0 10px}
+.ex{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.ex h3{margin:0;font-size:18px;font-weight:600;line-height:1.25}
+.meta{color:var(--muted);font-size:14px;margin-top:2px}
+.last{font-size:14px;margin-top:8px;color:var(--muted)}
+.up{font-size:14px;margin-top:6px;font-weight:600;color:var(--accent)}
+body[data-day="jeu"] .up{color:var(--text);text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:3px}
+.sets{display:grid;grid-template-columns:28px 1fr 1fr;gap:8px;align-items:center;margin-top:12px}
+.sets .h{font-size:13px;color:var(--muted)}
+.n{font-family:"Barlow Condensed","Roboto Condensed","sans-serif-condensed","Arial Narrow",sans-serif;font-weight:700;font-size:20px;text-align:center;color:var(--muted)}
+.sets input{width:100%;min-width:0;height:46px;border:1px solid var(--line);border-radius:10px;background:var(--field);color:var(--text);font:inherit;font-size:18px;text-align:center;padding:0 6px}
+.sets input::placeholder{color:var(--muted);opacity:.7}
+body[data-day="jeu"] .rules{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:20px;font-size:15px;color:var(--muted)}
+.rules p{margin:0 0 6px}.rules p:last-child{margin:0}
+.hitem{background:var(--surface);border:1px solid var(--line);border-radius:14px;margin-bottom:10px}
+.hitem summary{list-style:none;cursor:pointer;padding:14px;display:flex;align-items:center;gap:12px}
+.hitem summary::-webkit-details-marker{display:none}
+.dot{width:14px;height:14px;border-radius:50%;flex:0 0 auto}
+.hitem .t{font-weight:600}
+.hitem .s{color:var(--muted);font-size:14px}
+.hbody{padding:0 14px 14px;font-size:15px}
+.hbody p{margin:0 0 8px}
+.hbody b{font-weight:600}
+.empty{color:var(--muted);text-align:center;padding:32px 8px}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 16px}
+.del{margin-top:6px;height:40px;border-radius:10px;border:1px solid var(--line);background:transparent;color:var(--muted);font:inherit;padding:0 12px;cursor:pointer}
+</style>
+</head>
+<body data-day="lun">
+<div class="wrap">
+  <header>
+    <h1>Upper / Lower</h1>
+    <span class="date" id="date"></span>
+  </header>
+  <nav id="nav" aria-label="Séances"></nav>
+  <main id="main"></main>
+</div>
+<script>
+const PROGRAM = {
+  lun:{short:"Lun",name:"Lundi",title:"Upper A",sub:"Force",ex:[
+    ["Développé couché barre",4,"5-8",180],
+    ["Rowing poitrine appuyée",4,"6-10",150],
+    ["Développé militaire haltères",3,"8-10",150],
+    ["Tirage vertical prise neutre",3,"8-12",120],
+    ["Pec deck ou écarté poulie",3,"12-15",90],
+    ["Élévations latérales poulie",3,"12-20",90],
+    ["Extension triceps poulie au-dessus de la tête",3,"10-15",90],
+    ["Curl incliné haltères",3,"10-15",90]]},
+  mar:{short:"Mar",name:"Mardi",title:"Lower A",sub:"Quadriceps",ex:[
+    ["Squat barre profond",4,"5-8",180],
+    ["Soulevé de terre roumain",3,"6-10",150],
+    ["Presse à cuisses",3,"10-12",120],
+    ["Leg curl assis",3,"10-15",90],
+    ["Mollets debout, pause 2 s en bas",4,"8-12",90]]},
+  jeu:{short:"Jeu",name:"Jeudi",title:"Upper B",sub:"Hypertrophie",ex:[
+    ["Développé incliné haltères",4,"8-12",150],
+    ["Tractions (lestées si possible)",4,"6-10",150],
+    ["Rowing unilatéral haltère",3,"10-12",120],
+    ["Élévations latérales haltères",3,"12-20",90],
+    ["Écarté poulie vis-à-vis",3,"12-15",90],
+    ["Face pull ou oiseau poulie",3,"15-20",90],
+    ["Extension triceps barre au front",3,"10-12",90],
+    ["Curl marteau",3,"10-12",90]]},
+  ven:{short:"Ven",name:"Vendredi",title:"Lower B",sub:"Chaîne postérieure",ex:[
+    ["Hip thrust",4,"8-12",150],
+    ["Fente bulgare (par jambe)",3,"8-12",120],
+    ["Leg extension",3,"12-15",90],
+    ["Leg curl assis",3,"10-15",90],
+    ["Mollets assis",4,"12-15",90],
+    ["Ab wheel ou relevés de jambes suspendu",3,"10-15",90]]}
+};
+const ORDER = ["lun","mar","jeu","ven"];
+const COLORS = {lun:"var(--red)",mar:"var(--blue)",jeu:"var(--yellow)",ven:"var(--green)"};
+const KEY = "upperlower.sessions.v1";
+
+const pad = n => String(n).padStart(2,"0");
+function today(){ const d = new Date(); return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
+const fmtDate = iso => { const [y,m,d] = iso.split("-").map(Number); return new Date(y,m-1,d).toLocaleDateString("fr-FR",{weekday:"short",day:"numeric",month:"short"}); };
+const fmtRest = s => s%60 ? Math.floor(s/60)+" min "+(s%60) : (s/60)+" min";
+const rmax = r => Number(String(r).split("-").pop());
+const num = v => { const x = parseFloat(String(v).replace(",",".")); return isNaN(x) ? null : x; };
+function defaultDay(){ return ({1:"lun",2:"mar",3:"jeu",4:"jeu",5:"ven",6:"lun",0:"lun"})[new Date().getDay()]; }
+
+/* ---------- storage (on the phone) ---------- */
+function loadAll(){ try { const a = JSON.parse(localStorage.getItem(KEY) || "[]"); return Array.isArray(a) ? a : []; } catch(e){ return []; } }
+function writeAll(){ try { localStorage.setItem(KEY, JSON.stringify(sessions)); return true; } catch(e){ return false; } }
+let sessions = loadAll();
+
+let pending = null, saveTimer = null;
+function scheduleSave(s){
+  pending = s;
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(flush, 400);
+}
+function flush(){
+  clearTimeout(saveTimer); saveTimer = null;
+  if(!pending) return;
+  const s = pending; pending = null;
+  s.updated = Date.now();
+  const i = sessions.findIndex(x => x.id === s.id);
+  const copy = JSON.parse(JSON.stringify(s));
+  if(i >= 0) sessions[i] = copy; else sessions.push(copy);
+  setStatus(writeAll() ? "Enregistré" : "Erreur : impossible d'enregistrer sur ce téléphone");
+}
+window.addEventListener("pagehide", flush);
+document.addEventListener("visibilitychange", () => { if(document.visibilityState === "hidden") flush(); });
+function setStatus(t){ const el = document.getElementById("status"); if(el) el.textContent = t; }
+
+/* ---------- session helpers ---------- */
+let view = defaultDay();
+let current = null;
+
+function hasData(s){ return Object.values((s && s.ex) || {}).some(arr => Array.isArray(arr) && arr.some(x => x && (x.w || x.r))); }
+function getCurrent(day){
+  const id = today() + "_" + day;
+  if(current && current.id === id) return current;
+  const found = sessions.find(s => s.id === id);
+  current = found ? JSON.parse(JSON.stringify(found)) : {id, day, date:today(), ex:{}, updated:0};
+  return current;
+}
+function lastSession(day){
+  const tid = today() + "_" + day;
+  return sessions.filter(s => s.day === day && s.id !== tid && hasData(s))
+                 .sort((a,b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : (b.updated||0) - (a.updated||0)))[0] || null;
+}
+function setsOf(s, i){ return (s && s.ex && Array.isArray(s.ex[i])) ? s.ex[i] : []; }
+function setLine(arr){
+  return arr.filter(x => x && (x.w || x.r)).map(x => (x.w ? x.w + " kg" : "PDC") + " x " + (x.r || "?")).join(", ");
+}
+function go(v){ flush(); view = v; render(); window.scrollTo(0,0); }
+
+/* ---------- render ---------- */
+function renderNav(){
+  const nav = document.getElementById("nav");
+  nav.innerHTML = "";
+  for(const d of ORDER){
+    const b = document.createElement("button");
+    b.className = "plate " + d; b.type = "button";
+    b.style.setProperty("--c", COLORS[d]);
+    b.textContent = PROGRAM[d].short;
+    b.setAttribute("aria-label", PROGRAM[d].name + ", " + PROGRAM[d].title);
+    b.setAttribute("aria-pressed", String(view === d));
+    b.onclick = () => go(d);
+    nav.appendChild(b);
+  }
+  const h = document.createElement("button");
+  h.className = "plate hist"; h.type = "button"; h.textContent = "Historique";
+  h.setAttribute("aria-pressed", String(view === "hist"));
+  h.onclick = () => go("hist");
+  nav.appendChild(h);
+}
+
+function render(){
+  document.body.dataset.day = view;
+  document.getElementById("date").textContent = new Date().toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"});
+  renderNav();
+  const main = document.getElementById("main");
+  main.innerHTML = "";
+  if(view === "hist") return renderHistory(main);
+  const P = PROGRAM[view];
+  const s = getCurrent(view);
+  const last = lastSession(view);
+
+  const head = document.createElement("div");
+  head.className = "dayhead";
+  head.innerHTML = "<h2></h2><p></p>";
+  head.querySelector("h2").textContent = P.name + " : " + P.title;
+  head.querySelector("p").textContent = P.sub + (last ? ", dernière séance le " + fmtDate(last.date) : ", première séance");
+  main.appendChild(head);
+
+  const st = document.createElement("div");
+  st.className = "status"; st.id = "status";
+  main.appendChild(st);
+
+  P.ex.forEach(([name, nsets, reps, rest], i) => {
+    const card = document.createElement("section");
+    card.className = "ex";
+    const h3 = document.createElement("h3"); h3.textContent = name; card.appendChild(h3);
+    const meta = document.createElement("div"); meta.className = "meta";
+    meta.textContent = nsets + " séries de " + reps + " reps, repos " + fmtRest(rest);
+    card.appendChild(meta);
+
+    const prev = setsOf(last, i);
+    if(prev.some(x => x && (x.w || x.r))){
+      const l = document.createElement("div"); l.className = "last";
+      l.textContent = "Dernière fois : " + setLine(prev);
+      card.appendChild(l);
+      const top = prev.slice(0, nsets);
+      const full = top.length === nsets && top.every(x => x && num(x.r) !== null && num(x.r) >= rmax(reps));
+      if(full){
+        const u = document.createElement("div"); u.className = "up";
+        u.textContent = "Haut de fourchette atteint partout : augmente la charge.";
+        card.appendChild(u);
+      }
+    }
+
+    const grid = document.createElement("div");
+    grid.className = "sets";
+    grid.innerHTML = '<span class="h"></span><span class="h">Charge (kg)</span><span class="h">Reps</span>';
+    if(!Array.isArray(s.ex[i])) s.ex[i] = [];
+    for(let j = 0; j < nsets; j++){
+      const cur = s.ex[i][j] || (s.ex[i][j] = {w:"", r:""});
+      const p = prev[j] || {};
+      const n = document.createElement("span"); n.className = "n"; n.textContent = j+1;
+      const w = document.createElement("input");
+      w.type = "text"; w.inputMode = "decimal"; w.autocomplete = "off"; w.enterKeyHint = "next";
+      w.value = cur.w || ""; w.placeholder = p.w || "kg";
+      w.setAttribute("aria-label", name + ", série " + (j+1) + ", charge en kg");
+      w.oninput = () => { cur.w = w.value.trim(); scheduleSave(s); };
+      const r = document.createElement("input");
+      r.type = "text"; r.inputMode = "numeric"; r.autocomplete = "off"; r.enterKeyHint = "next";
+      r.value = cur.r || ""; r.placeholder = p.r || reps;
+      r.setAttribute("aria-label", name + ", série " + (j+1) + ", répétitions");
+      r.oninput = () => { cur.r = r.value.trim(); scheduleSave(s); };
+      grid.append(n, w, r);
+    }
+    card.appendChild(grid);
+    main.appendChild(card);
+  });
+
+  const rules = document.createElement("div");
+  rules.className = "rules";
+  rules.innerHTML = "<p>Arrête chaque série à 0 à 2 reps de l'échec. Échec complet seulement sur la dernière série des isolations.</p><p>Quand tu atteins le haut de la fourchette sur toutes les séries, augmente la charge.</p><p>Deload toutes les 5 à 8 semaines : volume divisé par deux.</p><p>Les chiffres en gris dans les cases sont ceux de ta dernière séance.</p>";
+  main.appendChild(rules);
+}
+
+function renderHistory(main){
+  const list = sessions.filter(hasData).sort((a,b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
+  const head = document.createElement("div");
+  head.className = "dayhead";
+  head.innerHTML = "<h2>Historique</h2><p></p>";
+  head.querySelector("p").textContent = list.length ? list.length + " séance" + (list.length>1?"s":"") + " enregistrée" + (list.length>1?"s":"") : "Aucune séance";
+  main.appendChild(head);
+
+  const tools = document.createElement("div"); tools.className = "tools";
+  const exp = document.createElement("button"); exp.className = "del"; exp.type = "button"; exp.textContent = "Sauvegarder mes données";
+  exp.onclick = exportData;
+  const imp = document.createElement("button"); imp.className = "del"; imp.type = "button"; imp.textContent = "Restaurer une sauvegarde";
+  const file = document.createElement("input"); file.type = "file"; file.accept = ".json,application/json"; file.hidden = true;
+  imp.onclick = () => file.click();
+  file.onchange = () => importData(file.files[0]);
+  tools.append(exp, imp, file);
+  main.appendChild(tools);
+  const st = document.createElement("div"); st.className = "status"; st.id = "status"; main.appendChild(st);
+
+  if(!list.length){
+    const e = document.createElement("div"); e.className = "empty";
+    e.textContent = "Choisis un jour en haut et note ta première série.";
+    main.appendChild(e); return;
+  }
+  for(const s of list){
+    const P = PROGRAM[s.day]; if(!P) continue;
+    const d = document.createElement("details"); d.className = "hitem";
+    const sum = document.createElement("summary");
+    const dot = document.createElement("span"); dot.className = "dot"; dot.style.background = COLORS[s.day];
+    const txt = document.createElement("span");
+    txt.innerHTML = '<div class="t"></div><div class="s"></div>';
+    txt.querySelector(".t").textContent = P.name + " : " + P.title;
+    txt.querySelector(".s").textContent = fmtDate(s.date);
+    sum.append(dot, txt); d.appendChild(sum);
+    const body = document.createElement("div"); body.className = "hbody";
+    P.ex.forEach(([name], i) => {
+      const line = setLine(setsOf(s, i));
+      if(!line) return;
+      const p = document.createElement("p");
+      const b = document.createElement("b"); b.textContent = name;
+      p.append(b, document.createElement("br"), document.createTextNode(line));
+      body.appendChild(p);
+    });
+    const del = document.createElement("button");
+    del.className = "del"; del.type = "button"; del.textContent = "Supprimer cette séance";
+    del.onclick = () => {
+      if(!confirm("Supprimer la séance du " + fmtDate(s.date) + " ?")) return;
+      sessions = sessions.filter(x => x.id !== s.id);
+      if(current && current.id === s.id) current = null;
+      writeAll();
+      render();
+    };
+    body.appendChild(del);
+    d.appendChild(body);
+    main.appendChild(d);
+  }
+}
+
+/* ---------- backup ---------- */
+async function exportData(){
+  flush();
+  const json = JSON.stringify({app:"upper-lower", version:1, sessions}, null, 1);
+  const name = "upper-lower-" + today() + ".json";
+  const blob = new Blob([json], {type:"application/json"});
+  try{
+    const f = new File([blob], name, {type:"application/json"});
+    if(navigator.canShare && navigator.canShare({files:[f]})){ await navigator.share({files:[f], title:name}); return; }
+  }catch(e){ if(e && e.name === "AbortError") return; }
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+function importData(f){
+  if(!f) return;
+  const rd = new FileReader();
+  rd.onload = () => {
+    try{
+      const data = JSON.parse(rd.result);
+      const list = Array.isArray(data) ? data : data.sessions;
+      if(!Array.isArray(list)) throw 0;
+      const valid = list.filter(s => s && typeof s.id === "string" && PROGRAM[s.day] && /^\d{4}-\d{2}-\d{2}$/.test(s.date) && s.ex && typeof s.ex === "object");
+      const map = new Map(sessions.map(s => [s.id, s]));
+      for(const s of valid){ const p = map.get(s.id); if(!p || (s.updated||0) >= (p.updated||0)) map.set(s.id, s); }
+      sessions = [...map.values()];
+      current = null;
+      writeAll();
+      render();
+      setStatus(valid.length + " séance" + (valid.length>1?"s":"") + " restaurée" + (valid.length>1?"s":""));
+    }catch(e){ setStatus("Ce fichier n'est pas une sauvegarde valide."); }
+  };
+  rd.readAsText(f);
+}
+
+render();
+if("serviceWorker" in navigator && location.protocol.startsWith("http")){
+  navigator.serviceWorker.register("sw.js").catch(() => {});
+}
+</script>
+</body>
+</html>
